@@ -1341,7 +1341,7 @@ func processNMEALine(l string) (sentenceUsed bool) {
 		setDataLogTimeWithGPS(mySituation)
 		return true
 
-	} else if (x[0] == "GNGSA") || (x[0] == "GPGSA") || (x[0] == "GLGSA") || (x[0] == "GAGSA") || (x[0] == "GBGSA") { // Satellite data.
+	} else if (x[0] == "GNGSA") || (x[0] == "GPGSA") { // Satellite data.
 		tmpSituation := mySituation // If we decide to not use the data in this message, then don't make incomplete changes in mySituation.
 
 		if len(x) < 18 {
