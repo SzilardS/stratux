@@ -28,9 +28,6 @@ var aprsExitChan chan bool = make(chan bool, 1)
 
 func authenticate(c net.Conn) {
 	filter := ""
-	if globalSettings.DEBUG {
-		filter = "filter r/48.8566/2.3522/500\r\n"
-	}
 	if mySituation.GPSFixQuality > 0 {
 		filter = fmt.Sprintf(
 			"filter r/%.7f/%.7f/%d\r\n", 
@@ -153,32 +150,42 @@ func aprsListen() {
 				} else if len(res) == 0 { // no group capture
 					log.Printf("No group capture: " + data)
 				} else if len(res) > 0 && len(res[14]) > 0 {
+					ts := time.Now().UTC()
+					hh, _ := strconv.ParseInt(res[4][:2], 10, 8)
+					mm, _ := strconv.ParseInt(res[4][2:4], 10, 8)
+					ss, err := strconv.ParseInt(res[4][4:], 10, 8)
+					if err != nil {
+						continue
+					}
+					ts = time.Date(ts.Year(), ts.Month(), ts.Day(), int(hh), int(mm), int(ss), 0, time.UTC)
+
+
 					lat, err := strconv.ParseFloat(res[5][:2], 64)
 					if err != nil {
-						log.Printf(err.Error())
+						continue
 					}
 					lat_m, err := strconv.ParseFloat(res[5][2:len(res[5])-1], 64)
 					if err != nil {
-						log.Printf(err.Error())
+						continue
 					}
 					lat_m3d, err := strconv.ParseFloat(res[12][:1], 64)
 					if err != nil {
-						log.Printf(err.Error())
+						continue
 					}
 					if strings.Contains(res[5], "S") {
 						lat = -lat
 					}
 					lon, err := strconv.ParseFloat(res[6][:3], 64)
 					if err != nil {
-						log.Printf(err.Error())
+						continue
 					}
 					lon_m, err := strconv.ParseFloat(res[6][3:len(res[6])-1], 64)
 					if err != nil {
-						log.Printf(err.Error())
+						continue
 					}
 					lon_m3d, err := strconv.ParseFloat(res[12][1:], 64)
 					if err != nil {
-						log.Printf(err.Error())
+						continue
 					}
 					if strings.Contains(res[6], "W") {
 						lon = -lon
@@ -186,15 +193,15 @@ func aprsListen() {
 
 					track, err := strconv.ParseFloat(res[8], 64)
 					if err != nil {
-						log.Printf(err.Error())
+						continue
 					}
 					speed, err := strconv.ParseFloat(res[9], 64)
 					if err != nil {
-						log.Printf(err.Error())
+						continue
 					}
 					alt, err := strconv.ParseFloat(res[10], 64)
 					if err != nil {
-						log.Printf(err.Error())
+						continue
 					}
 
 					details, err := hex.DecodeString(res[14][:2])
@@ -207,7 +214,7 @@ func aprsListen() {
 
 					msg := OgnMessage{
 						Sys:       res[1],
-						Time:      0,
+						Time:      ts.Unix(),
 						Addr:      res[2],
 						Addr_type: int32(addr_type),
 						Acft_type: fmt.Sprintf("%d", acft_type),
