@@ -133,7 +133,7 @@ type gpsPerfStats struct {
 
 var gpsPerf gpsPerfStats
 var myGPSPerfStats []gpsPerfStats
-var gpsTimeOffsetPpsMs = 100.0 * time.Millisecond
+var gpsTimeOffsetPpsMs = 500.0 * time.Millisecond
 
 var serialConfig *serial.Config
 var serialPort *serial.Port
