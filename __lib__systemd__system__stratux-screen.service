@@ -1,0 +1,14 @@
+[Unit]
+Description=Stratux screen
+After=network.target
+
+[Service]
+ExecStart=/opt/stratux/bin/screen.py
+ExecStop=/bin/kill $(pgrep -f 'python /opt/stratux/bin/screen.py')
+KillMode=process
+Restart=always
+RestartSec=5
+LimitCORE=1073741824
+
+[Install]
+WantedBy=multi-user.target

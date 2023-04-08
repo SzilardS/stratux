@@ -61,6 +61,7 @@ optinstall: www ogn/ddb.json
 	mkdir -p $(STRATUX_HOME)/cfg
 	mkdir -p $(STRATUX_HOME)/lib
 	mkdir -p $(STRATUX_HOME)/mapdata
+	mkdir -p $(STRATUX_HOME)/data
 	chmod a+rwx $(STRATUX_HOME)/mapdata # so users can upload their stuff as user pi
 
 	# binaries
@@ -93,6 +94,10 @@ optinstall: www ogn/ddb.json
 	cp -f image/wpa_supplicant.conf.template $(STRATUX_HOME)/cfg/
 	cp -f image/wpa_supplicant_ap.conf.template $(STRATUX_HOME)/cfg/
 
+	# OLED Screen
+	cp -f test/screen/screen.py  $(STRATUX_HOME)/bin/
+	cp -f test/screen/stratux-logo-64x64.bmp  $(STRATUX_HOME)/data/
+	cp -f test/screen/CnC_Red_Alert.ttf  $(STRATUX_HOME)/data/
 
 install: optinstall
 	-$(STRATUX_HOME)/bin/fancontrol remove
@@ -104,6 +109,9 @@ install: optinstall
 	cp __lib__systemd__system__stratux.service /lib/systemd/system/stratux.service
 	chmod 644 /lib/systemd/system/stratux.service
 	ln -fs /lib/systemd/system/stratux.service /etc/systemd/system/multi-user.target.wants/stratux.service
+	cp __lib__systemd__system__stratux-screen.service /lib/systemd/system/stratux-screen.service
+	chmod 644 /lib/systemd/system/stratux-screen.service
+	ln -fs /lib/systemd/system/stratux-screen.service /etc/systemd/system/multi-user.target.wants/stratux-screen.service
 
 
 clean:
